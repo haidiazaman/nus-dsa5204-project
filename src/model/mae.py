@@ -34,7 +34,8 @@ class MAE(nn.Module):
         self.decoder_dim = decoder_dim
         self.enc_to_dec = nn.Linear(encoder_dim, decoder_dim) if encoder_dim != decoder_dim else nn.Identity()
         self.mask_token = nn.Parameter(torch.randn(decoder_dim))
-        self.decoder = Transformer(dim=decoder_dim, depth=decoder_depth, heads=decoder_heads, dim_head=decoder_dim_head, mlp_dim=decoder_dim * 4)
+        self.decoder = Transformer(dim=decoder_dim, depth=decoder_depth, heads=decoder_heads, dim_head=decoder_dim_head,
+                                   mlp_dim=decoder_dim * 4)
         self.decoder_pos_emb = nn.Embedding(num_patches, decoder_dim)
         self.to_pixels = nn.Linear(decoder_dim, pixel_values_per_patch)
 
@@ -70,7 +71,8 @@ class MAE(nn.Module):
 
         encoded_tokens, hidden_states_encoder = self.encoder.transformer(tokens)
 
-        # project encoder to decoder dimensions, if they are not equal - the paper says you can get away with a smaller dimension for decoder
+        # project encoder to decoder dimensions, if they are not equal
+        # the paper says you can get away with a smaller dimension for decoder
 
         decoder_tokens = self.enc_to_dec(encoded_tokens)
 
