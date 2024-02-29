@@ -5,6 +5,8 @@ This repository hosts the code for our DSA5204 Project, which aims to reproduce 
 ## Note to group members (This section will be removed upon submission)
 
 - Do not commit any data! Just update markdown on how to download data and structure the files/folders
+- Do not commit any Jupyter notebooks, write a script
+- Use PyTorch
 - Refer to [here](https://github.com/joelparkerhenderson/git-commit-message) to write good commit messages
 
 ## Development Setup
@@ -32,7 +34,7 @@ To set up using pip, run the following:
 ## Datasets
 
 We make use of the following datasets:
-- ImageNet1K (IN1K): Download the following files [here](https://image-net.org/challenges/LSVRC/2012/2012-downloads.php): (1) Development kit (Tasks 1 & 2), (2) Training images (Task 1 & 2), and (3) Validation images (all tasks) in the `data/imagenet1k` folder and run the following code from root folder:
+- ImageNet1K (IN1K): Download the following files from [here](https://image-net.org/challenges/LSVRC/2012/2012-downloads.php): (1) Development kit (Tasks 1 & 2), (2) Training images (Task 1 & 2), and (3) Validation images (all tasks), place them in the `data/imagenet1k` folder and run the following code from root folder:
 
         from torchvision.datasets import ImageNet
         train = ImageNet(root='./data/imagenet1k', split='train')
