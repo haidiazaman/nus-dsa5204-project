@@ -1,7 +1,12 @@
 import argparse
 import torch
+import numpy as np
+
 from torchvision import transforms
+
 from ..dataset.imagenet import ImageNet
+from ..model.vit import vit_large
+from ..model.mae import MAE
 
 
 def get_args():
@@ -13,6 +18,7 @@ def get_args():
 
     # Model parameters
     parser.add_argument('--image_size', type=int, default=224, help='image size')
+    parser.add_argument('--image_patch_size', type=int, default=16, help='image patch size')
     parser.add_argument('--mask_ratio', type=float, default=0.75, help='masking ratio')
 
     # Dataset parameters
@@ -34,6 +40,10 @@ def get_args():
 def main(args):
 
     device = torch.device(args.device)
+    seed = args.seed
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    np.random.seed(seed)
 
     # Augmentation
     transform_train = transforms.Compose([
@@ -42,7 +52,27 @@ def main(args):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    dataset = ImageNet(args.data_path, 'train', transform=transform_train)
+
+    # Dataset
+    dataset_train = ImageNet(args.data_path, 'train', transform=transform_train)
+    sampler_train = torch.utils.data.RandomSampler(dataset_train)
+    data_loader_train = torch.utils.data.DataLoader(
+        dataset_train,
+        batch_size=args.batch_size,
+        sampler=sampler_train,
+        num_workers=args.num_workers,
+        pin_memory=args.pin_memory,
+        drop_last=True
+    )
+
+    # Model
+    vit = vit_large(
+        image_size=args.image_size,
+        patch_size=args.image_patch_size,
+        num_classes=1000,
+    )
+    mae = MAE(encoder=vit)
+    mae.to(device)
 
 
 if __name__ == '__main__':
