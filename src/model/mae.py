@@ -11,7 +11,7 @@ class MAE(nn.Module):
             self,
             *,
             encoder,
-            decoder_dim,
+            decoder_dim=512,
             masking_ratio=0.75,
             decoder_depth=1,
             decoder_heads=8,
