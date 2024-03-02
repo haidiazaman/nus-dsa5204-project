@@ -4,7 +4,7 @@ from torch import nn
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 
-from transformer import pair, Transformer
+from .transformer import pair, Transformer
 
 
 class ViT(nn.Module):

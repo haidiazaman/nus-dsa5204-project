@@ -3,7 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 
 from einops import rearrange, repeat
-from transformer import Transformer
+from .transformer import Transformer
 
 
 class MAE(nn.Module):
