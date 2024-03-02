@@ -17,13 +17,17 @@ def get_args():
 
     # Dataset parameters
     parser.add_argument('--data_path', type=str, default='data/imagenet1k', help='path to ImageNet data')
+    parser.add_argument('--output_dir', type=str, default='/weights', help='path to save checkpoints and logs')
     parser.add_argument('--device', type=str, default='cuda', help='device to use for training')
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
+    parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
+    parser.add_argument('--pin_memory', type=bool, default=True, help='pin memory for data loading')
 
     # Optimizer parameters
     parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.05, help='weight decay')
     parser.add_argument('--warmup_epochs', type=int, default=40, help='epochs to warmup LR')
+
     return parser.parse_args()
 
 
