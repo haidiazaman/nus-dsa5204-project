@@ -19,6 +19,5 @@ class ImageNet(Dataset):
 
     def __getitem__(self, idx):
         img, label = self.dataset[idx]
-        img = img.resize((256, 256), resample=0)
         img = np.array(img)
         return img, label
