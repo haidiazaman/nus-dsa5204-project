@@ -1,6 +1,7 @@
 import argparse
-import torch
 import numpy as np
+import time
+import torch
 
 from torchvision import transforms
 
@@ -13,8 +14,8 @@ def get_args():
     parser = argparse.ArgumentParser(description='MAE Pretraining on ImageNet')
 
     # Training parameters
-    parser.add_argument('--batch_size', type=int, default=32, help='batch size for training')
-    parser.add_argument('--epochs', type=int, default=100, help='number of epochs to train')
+    parser.add_argument('--batch_size', type=int, default=8, help='batch size for training')
+    parser.add_argument('--epochs', type=int, default=800, help='number of epochs to train')
 
     # Model parameters
     parser.add_argument('--image_size', type=int, default=224, help='image size')
@@ -23,7 +24,7 @@ def get_args():
 
     # Dataset parameters
     parser.add_argument('--data_path', type=str, default='data/imagenet1k', help='path to ImageNet data')
-    parser.add_argument('--output_dir', type=str, default='/weights', help='path to save checkpoints and logs')
+    parser.add_argument('--output_dir', type=str, default='src/checkpoints', help='path to save checkpoints')
     parser.add_argument('--device', type=str, default='cuda', help='device to use for training')
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
     parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
@@ -32,7 +33,6 @@ def get_args():
     # Optimizer parameters
     parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.05, help='weight decay')
-    parser.add_argument('--warmup_epochs', type=int, default=40, help='epochs to warmup LR')
 
     return parser.parse_args()
 
@@ -73,6 +73,26 @@ def main(args):
     )
     mae = MAE(encoder=vit)
     mae.to(device)
+
+    # Optimizer
+    optimizer = torch.optim.AdamW(mae.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.95))
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
+
+    # Training
+    start_time = time.time()
+    for epoch in range(args.epochs):
+        mae.train()
+        for img, _ in data_loader_train:
+            img = img.to(device)
+            optimizer.zero_grad()
+            loss, _, _, _ = mae(img)
+            loss.backward()
+            optimizer.step()
+        lr_scheduler.step()
+        if (epoch + 1) % 50 == 0:
+            torch.save(mae.state_dict(), f'{args.output_dir}/pretrain_mae_imagenet_epoch{epoch + 1}.pth')
+    end_time = time.time()
+    print(f'Training time: {end_time - start_time} seconds')
 
 
 if __name__ == '__main__':
