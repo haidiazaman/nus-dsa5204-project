@@ -23,13 +23,15 @@ To set up using pip, run the following:
 ### Project Structure (To be updated)
 
     .
-    ├── ...
+    ├── README.md
     ├── data                    # Put data in this folder. **Do not commit!**
+    │   ├── imagenet            # ImageNet dataset
     ├── src                     # Source code
     │   ├── dataset             # Dataloaders
     │   ├── model               # Model architectures
-    │   └── ...                 # etc.
-    └── ...
+    │   └── scripts             # Training scripts  
+    ├── requirements.txt 
+    └── .gitignore
 
 ## Datasets
 
