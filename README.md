@@ -1,6 +1,6 @@
 # DSA5204 Project
 
-This repository hosts the code for our DSA5204 Project, which aims to reproduce and extend the work done in [Masked Autoencoders Are Scalable Vision Learners](https://arxiv.org/abs/2111.06377).
+This repository hosts the code for our NUS DSA5204 Project, which aims to reproduce and extend the work done in [Masked Autoencoders Are Scalable Vision Learners](https://arxiv.org/abs/2111.06377).
 
 ## Note to group members (This section will be removed upon submission)
 
