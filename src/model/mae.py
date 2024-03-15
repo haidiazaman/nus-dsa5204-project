@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from einops import rearrange, repeat
+from einops import repeat
 from .transformer import Transformer
 
 
@@ -69,7 +69,7 @@ class MAE(nn.Module):
 
         # attend with vision transformer
 
-        encoded_tokens, hidden_states_encoder = self.encoder.transformer(tokens)
+        encoded_tokens = self.encoder.transformer(tokens)
 
         # project encoder to decoder dimensions, if they are not equal
         # the paper says you can get away with a smaller dimension for decoder
@@ -90,7 +90,7 @@ class MAE(nn.Module):
         decoder_tokens = torch.zeros(batch, num_patches, self.decoder_dim, device=device)
         decoder_tokens[batch_range, unmasked_indices] = unmasked_decoder_tokens
         decoder_tokens[batch_range, masked_indices] = mask_tokens
-        decoded_tokens, hidden_states_decoder = self.decoder(decoder_tokens)
+        decoded_tokens = self.decoder(decoder_tokens)
 
         # splice out the mask tokens and project to pixel values
 
