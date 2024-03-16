@@ -3,6 +3,9 @@ import numpy as np
 import time
 import torch
 from torchvision import transforms
+import torch_xla.core.xla_model as xm
+import torch_xla.distributed.parallel_loader as pl
+import torch_xla.distributed.xla_multiprocessing as xmp
 
 from ..dataset.imagenet import TinyImageNet
 from ..model.vit import vit_large
@@ -24,7 +27,7 @@ def get_args():
     # Dataset parameters
     # parser.add_argument('--data_path', type=str, default='data/imagenet1k', help='path to ImageNet data')
     parser.add_argument('--output_dir', type=str, default='src/checkpoints', help='path to save checkpoints')
-    parser.add_argument('--device', type=str, default='cuda', help='device to use for training')
+    # parser.add_argument('--device', type=str, default='cuda', help='device to use for training')
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
     parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
     parser.add_argument('--pin_memory', type=bool, default=True, help='pin memory for data loading')
@@ -38,7 +41,7 @@ def get_args():
 
 def main(args):
 
-    device = torch.device(args.device)
+    device = xm.xla_device() # torch.device(args.device)
     seed = args.seed
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
