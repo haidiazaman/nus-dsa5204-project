@@ -4,7 +4,7 @@ import time
 import torch
 from torchvision import transforms
 
-from ..dataset.imagenet import CIFAR100
+from ..dataset.cifar100 import CIFAR100
 from ..model.vit import vit_large
 from ..model.mae import MAE
 
@@ -13,12 +13,12 @@ def get_args():
     parser = argparse.ArgumentParser(description='MAE Pretraining on ImageNet')
 
     # Training parameters
-    parser.add_argument('--batch_size', type=int, default=64, help='batch size for training')
+    parser.add_argument('--batch_size', type=int, default=16, help='batch size for training')
     parser.add_argument('--epochs', type=int, default=800, help='number of epochs to train')
 
     # Model parameters
     parser.add_argument('--image_size', type=int, default=32, help='image size')
-    parser.add_argument('--image_patch_size', type=int, default=2, help='image patch size')
+    parser.add_argument('--image_patch_size', type=int, default=4, help='image patch size')
     parser.add_argument('--mask_ratio', type=float, default=0.75, help='masking ratio')
 
     # Dataset parameters
@@ -46,10 +46,10 @@ def main(args):
 
     # Augmentation
     transform_train = transforms.Compose([
-        transforms.RandomResizedCrop(args.image_size, scale=(0.6, 1.0), interpolation=3),
+        transforms.RandomResizedCrop(args.image_size, scale=(0.8, 1.0), interpolation=3),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761])
     ])
 
     # Dataset
@@ -86,7 +86,6 @@ def main(args):
             img = img.to(device)
             optimizer.zero_grad()
             loss, _, _, _ = mae(img)
-            print(loss)
             loss.backward()
             optimizer.step()
         lr_scheduler.step()
