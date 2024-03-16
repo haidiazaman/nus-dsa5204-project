@@ -9,7 +9,7 @@ class CIFAR100(Dataset):
         self.path = path
         self.train = train
         self.transform = transform
-        self.dataset = torchvision.datasets.CIFAR100(path, train=train, transform=transform)
+        self.dataset = torchvision.datasets.CIFAR100(path, train=train, transform=transform, download=True)
 
     def __len__(self):
         return len(self.dataset)
