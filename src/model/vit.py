@@ -70,20 +70,20 @@ class ViT(nn.Module):
 
 def vit_base(**kwargs):
     model = ViT(
-        dim=12, depth=768, mlp_dim=3072, heads=12, **kwargs
+        depth=12, dim=768, mlp_dim=3072, heads=12, **kwargs
     )
     return model
 
 
 def vit_large(**kwargs):
     model = ViT(
-        dim=24, depth=1024, mlp_dim=4096, heads=16, **kwargs
+        depth=24, dim=1024, mlp_dim=4096, heads=16, **kwargs
     )
     return model
 
 
 def vit_huge(**kwargs):
     model = ViT(
-        dim=32, depth=1280, mlp_dim=5120, heads=16, **kwargs
+        depth=32, dim=1280, mlp_dim=5120, heads=16, **kwargs
     )
     return model
