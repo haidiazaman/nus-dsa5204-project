@@ -183,3 +183,6 @@ pyrightconfig.json
 *.npy
 *.ts
 model_ts*.txt
+
+# Upernet data
+upernet/data/ADEChallengeData2016
