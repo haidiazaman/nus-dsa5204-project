@@ -72,7 +72,7 @@ def main(args):
     start_time = time.time()
     for epoch in range(args.epochs):
         segmentation_module.train()
-        for batch_idx, img_dict in enumerate(iter(train_loader)):
+        for batch_idx, img_dict in enumerate(train_loader):
             print(f'Epoch: {epoch + 1}, Batch: {batch_idx + 1}')
             for k in img_dict.keys():
                 img_dict[k] = img_dict[k].to(device)

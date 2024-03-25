@@ -191,10 +191,9 @@ class TrainDataset(BaseDataset):
         output['img_data'] = batch_images
         output['seg_label'] = batch_segms
         return output
-
+    
     def __len__(self):
-        return int(1e10) # It's a fake length due to the trick that every loader maintains its own list
-        #return self.num_sampleclass
+        return self.num_sample
 
 
 class ValDataset(BaseDataset):
