@@ -57,17 +57,17 @@ def main(args):
         num_classes=150,
     )
 
-    state_dict = torch.load('pretrain_mae_tinyimagenet_epoch600.pth')
-    new_state_dict = {key.replace('encoder.', ''): value for key, value in state_dict.items() if key.split('.')[0] == 'encoder'}
-    for key in ['to_patch_embedding.1.weight', 'to_patch_embedding.1.bias', 'to_patch_embedding.2.weight', 'mlp_head.weight', 'mlp_head.bias']:
-        new_state_dict.pop(key)
-    vit.load_state_dict(new_state_dict, strict=False)
+    # state_dict = torch.load('pretrain_mae_tinyimagenet_epoch600.pth')
+    # new_state_dict = {key.replace('encoder.', ''): value for key, value in state_dict.items() if key.split('.')[0] == 'encoder'}
+    # for key in ['to_patch_embedding.1.weight', 'to_patch_embedding.1.bias', 'to_patch_embedding.2.weight', 'mlp_head.weight', 'mlp_head.bias']:
+    #     new_state_dict.pop(key)
+    # vit.load_state_dict(new_state_dict, strict=False)
 
     upernet = uper()
 
     crit = nn.NLLLoss(ignore_index=-1)
     segmentation_module = SegmentationModule(vit, upernet, crit)
-
+    segmentation_module.load_state_dict(torch.load('upernet_epoch400.pth'))
     segmentation_module.to(device)
 
     # Optimizer
