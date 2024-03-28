@@ -63,7 +63,8 @@ class ViT(nn.Module):
         self.mlp_head = nn.Linear(dim, num_classes)
 
     def forward(self, img, **kwargs):
-        img = torch.squeeze(img)
+        if img.shape[0] != 1:
+            img = torch.squeeze(img)
         x = self.to_patch_embedding(img)
         b, n, _ = x.shape
         cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)

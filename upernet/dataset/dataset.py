@@ -226,7 +226,7 @@ class ValDataset(BaseDataset):
             target_height = self.round2nearest_multiple(target_height, self.padding_constant)
 
             # resize images
-            img_resized = imresize(img, (target_width, target_height), interp='bilinear')
+            img_resized = imresize(img, (self.imgMaxSize, self.imgMaxSize), interp='bilinear')
 
             # image transform, to torch float tensor 3xHxW
             img_resized = self.img_transform(img_resized)
@@ -272,7 +272,7 @@ class TestDataset(BaseDataset):
             target_height = self.round2nearest_multiple(target_height, self.padding_constant)
 
             # resize images
-            img_resized = imresize(img, (target_width, target_height), interp='bilinear')
+            img_resized = imresize(img, (self.imgMaxSize, self.imgMaxSize), interp='bilinear')
 
             # image transform, to torch float tensor 3xHxW
             img_resized = self.img_transform(img_resized)

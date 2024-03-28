@@ -108,5 +108,5 @@ class UPerNet(nn.Module):
         return x
     
 def uper(**kwargs):
-    model = UPerNet()
+    model = UPerNet(**kwargs)
     return model
