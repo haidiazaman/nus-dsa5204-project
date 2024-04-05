@@ -4,3 +4,5 @@ pillow==10.2.0
 torch==2.2.1
 torchvision==0.17.1
 yacs==0.1.8
+monai-weekly[nibabel, tqdm, einops]
+tqdm
