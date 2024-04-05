@@ -96,7 +96,9 @@ class Transformer(nn.Module):
             ]))
 
     def forward(self, x):
+        hidden_states_out = list()
         for attn, ff in self.layers:
             x = attn(x) + x
             x = ff(x) + x
-        return x
+            hidden_states_out.append(x)
+        return x, hidden_states_out

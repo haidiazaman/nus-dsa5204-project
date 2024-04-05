@@ -60,7 +60,7 @@ class ViT(nn.Module):
         x += self.pos_embedding[:, :(n + 1)]
         x = self.dropout(x)
 
-        x = self.transformer(x)
+        x, _ = self.transformer(x)
 
         x = x.mean(dim=1) if self.pool == 'mean' else x[:, 0]
 
