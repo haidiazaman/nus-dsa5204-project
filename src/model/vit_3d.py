@@ -4,7 +4,7 @@ from torch import nn
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 
-from .transformer import pair, Transformer
+from src.model.transformer import pair, Transformer
 
 
 class ViT3D(nn.Module):
@@ -63,14 +63,30 @@ class ViT3D(nn.Module):
         x = self.to_patch_embedding(video)
         b, n, _ = x.shape
 
-        cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
-        x = torch.cat((cls_tokens, x), dim=1)
-        x += self.pos_embedding[:, :(n + 1)]
+        x += self.pos_embedding[:, :n]
         x = self.dropout(x)
 
-        x = self.transformer(x)
+        x, hidden_states_out = self.transformer(x)
 
-        x = x.mean(dim=1) if self.pool == 'mean' else x[:, 0]
+        return x, hidden_states_out
 
-        x = self.to_latent(x)
-        return self.mlp_head(x)
+
+def vit_3d_base(**kwargs):
+    model = ViT3D(
+        depth=12, dim=768, mlp_dim=3072, heads=12, **kwargs
+    )
+    return model
+
+
+def vit_3d_large(**kwargs):
+    model = ViT3D(
+        depth=24, dim=1024, mlp_dim=4096, heads=16, **kwargs
+    )
+    return model
+
+
+def vit_3d_huge(**kwargs):
+    model = ViT3D(
+        depth=32, dim=1280, mlp_dim=5120, heads=16, **kwargs
+    )
+    return model
