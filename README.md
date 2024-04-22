@@ -42,4 +42,8 @@ We make use of the following datasets:
         train = ImageNet(root='./data/imagenet1k', split='train')
         val = ImageNet(root='./data/imagenet1k', split='val')
 
+- ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
 
+## References 
+
+Upernet: https://github.com/CSAILVision/semantic-segmentation-pytorch

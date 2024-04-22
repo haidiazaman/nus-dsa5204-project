@@ -185,4 +185,4 @@ pyrightconfig.json
 model_ts*.txt
 
 # Upernet data
-upernet/data/ADEChallengeData2016
+src/upernet/data/ADEChallengeData2016

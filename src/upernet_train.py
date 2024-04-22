@@ -5,11 +5,11 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-from dataset.dataset import TrainDataset
+from dataset.ade20k import TrainDataset
 from config import cfg
-from model.vit import vit_base
-from model.upernet import uper
-from model.segmentation import SegmentationModule
+from model.upernet.vit import vit_base
+from model.upernet.upernet import uper
+from model.upernet.segmentation import SegmentationModule
 
 def get_args():
     parser = argparse.ArgumentParser(description='MAE Pretraining on ImageNet')
@@ -23,7 +23,7 @@ def get_args():
     parser.add_argument('--image_patch_size', type=int, default=16, help='image patch size')
 
     # Dataset parameters
-    parser.add_argument('--output_dir', type=str, default='src/checkpoints', help='path to save checkpoints')
+    parser.add_argument('--output_dir', type=str, default='checkpoints', help='path to save checkpoints')
     parser.add_argument('--device', type=str, default='cuda', help='device to use for training')
     parser.add_argument('--seed', type=int, default=42, help='seed for reproducibility')
     parser.add_argument('--num_workers', type=int, default=4, help='number of workers for data loading')
@@ -47,7 +47,7 @@ def main(args):
 
     # Dataset
     cfg.merge_from_file("config/ade20k-resnet50-upernet.yaml")
-    dataset_train = TrainDataset("./data/","./data/training.odgt", cfg.DATASET)
+    dataset_train = TrainDataset("../data/","../data/training.odgt", cfg.DATASET)
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size, shuffle=False, pin_memory=args.pin_memory)
 
     # Model
@@ -56,18 +56,18 @@ def main(args):
         patch_size=args.image_patch_size,
         num_classes=150,
     )
-
-    # state_dict = torch.load('pretrain_mae_tinyimagenet_epoch600.pth')
-    # new_state_dict = {key.replace('encoder.', ''): value for key, value in state_dict.items() if key.split('.')[0] == 'encoder'}
-    # for key in ['to_patch_embedding.1.weight', 'to_patch_embedding.1.bias', 'to_patch_embedding.2.weight', 'mlp_head.weight', 'mlp_head.bias']:
-    #     new_state_dict.pop(key)
-    # vit.load_state_dict(new_state_dict, strict=False)
-
+    
+    state_dict = torch.load('../data/pretrain_mae_tinyimagenet_epoch600.pth')
+    new_state_dict = {key.replace('encoder.', ''): value for key, value in state_dict.items() if key.split('.')[0] == 'encoder'}
+    for key in ['to_patch_embedding.1.weight', 'to_patch_embedding.1.bias', 'to_patch_embedding.2.weight', 'mlp_head.weight', 'mlp_head.bias']:
+        new_state_dict.pop(key)
+    vit.load_state_dict(new_state_dict, strict=False)
+    
     upernet = uper()
 
     crit = nn.NLLLoss(ignore_index=-1)
     segmentation_module = SegmentationModule(vit, upernet, crit)
-    segmentation_module.load_state_dict(torch.load('upernet_epoch400.pth'))
+
     segmentation_module.to(device)
 
     # Optimizer
@@ -92,7 +92,7 @@ def main(args):
             optimizer.step()
         lr_scheduler.step()
         if (epoch + 1) % 50 == 0:
-            torch.save(segmentation_module.state_dict(), f'{args.output_dir}/upernet_epoch{epoch + 1}.pth')
+            torch.save(segmentation_module.state_dict(), f'{args.output_dir}/upernet_pretrain_epoch{epoch + 1}.pth')
             end_time = time.time()
             print(f'Training time: {end_time - start_time} seconds')
 
