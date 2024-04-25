@@ -79,7 +79,7 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 # ipython/jupyter notebooks
-*.ipynb
+# *.ipynb
 **/.ipynb_checkpoints/
 
 # IPython
