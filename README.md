@@ -17,8 +17,8 @@ Extension 2: 2D Segmentation
 Extension 3: 3D Segmentation
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/3d_seg_output.png)
 
-Extension 4: Data Imputation
-![alt text]()
+Extension 4: Data Imputation (MAE shows unstable training and eventually poorer results compared to no MAE)
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/imputation_res.png)
 
 ## Development Setup
 
