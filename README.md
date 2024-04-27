@@ -5,19 +5,20 @@ This diagram shows the model architecture for the paper. The encoder is a ViT an
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/mae_architecture.png)
 
 ## Results
-Reproduction of paper results using TinyImageNet dataset.
+Reproduction of paper results using TinyImageNet dataset. Example results of image reconstruction of TinyImageNet data using MAE architecture. For each triplet, the leftmost image displays the base image, the middle image displays the input data and the rightmost image displays the reconstructed image.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/tinyimgnet.png)
 
-Extension 1: Time Series forecast (compare no MAE vs MAE across 3 different masking ratios, these time series are the smoothed time series of the actual forecast)
+Extension 1: Time Series forecast. The smoothed models’ forecast predictions on the test dataset is shown. A smoothing window has been
+applied using a moving average with a window size of 20 timesteps. This results in plots that only capture the general trend.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/time_series_results.png)
 
-Extension 2: 2D Segmentation (MAE pretraining shows improvement over no MAE pretraining)
+Extension 2: 2D Segmentation. Example results of the models conducting semantic segmentation. MAE pretraining shows improvement over no MAE pretraining.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/semseg_output.png)
 
-Extension 3: 3D Segmentation (MAE pretraining shows improvement over no MAE pretraining)
+Extension 3: 3D Segmentation. Example 3D Segmentation result. MAE pretraining shows improvement over no MAE pretraining.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/3d_seg_output.png)
 
-Extension 4: Data Imputation (MAE shows unstable training and eventually poorer results compared to no MAE)
+Extension 4: Data Imputation. Training loss over epochs comparison. MAE shows unstable training and eventually poorer results compared to no MAE.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/imputation_res.png)
 
 ## Development Setup
