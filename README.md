@@ -52,6 +52,7 @@ We make use of the following datasets:
         train = ImageNet(root='./data/imagenet1k', split='train')
         val = ImageNet(root='./data/imagenet1k', split='val')
 
+- Reproduction, TinyImagenet: Data is available at https://huggingface.co/datasets/zh-plus/tiny-imagenet. Instead of manual download, it can be called using the huggingface library directly.
 - Time Series, ETTh1: Data is available at: https://github.com/zhouhaoyi/ETDataset
 - 2d segmentation, ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
 - 3d segmentation, BTCV: https://www.synapse.org/#!Synapse:syn3193805
