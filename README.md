@@ -58,5 +58,5 @@ We make use of the following datasets:
 - 3d segmentation, BTCV: https://www.synapse.org/#!Synapse:syn3193805
 ## References 
 
-Upernet: https://github.com/CSAILVision/semantic-segmentation-pytorch
-Time Series: https://github.com/asmodaay/ti-mae
+- Upernet: https://github.com/CSAILVision/semantic-segmentation-pytorch
+- Time Series: https://github.com/asmodaay/ti-mae
