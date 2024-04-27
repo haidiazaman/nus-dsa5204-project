@@ -11,10 +11,10 @@ Reproduction of paper results using TinyImageNet dataset.
 Extension 1: Time Series forecast (compare no MAE vs MAE across 3 different masking ratios, these time series are the smoothed time series of the actual forecast)
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/time_series_results.png)
 
-Extension 2: 2D Segmentation
+Extension 2: 2D Segmentation (MAE pretraining shows improvement over no MAE pretraining)
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/semseg_output.png)
 
-Extension 3: 3D Segmentation
+Extension 3: 3D Segmentation (MAE pretraining shows improvement over no MAE pretraining)
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/3d_seg_output.png)
 
 Extension 4: Data Imputation (MAE shows unstable training and eventually poorer results compared to no MAE)
@@ -51,8 +51,8 @@ We make use of the following datasets:
         train = ImageNet(root='./data/imagenet1k', split='train')
         val = ImageNet(root='./data/imagenet1k', split='val')
 
-- 2d segmentation, ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
 - Time Series, ETTh1: Data is available at: https://github.com/zhouhaoyi/ETDataset
+- 2d segmentation, ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
 - 3d segmentation, BTCV: https://www.synapse.org/#!Synapse:syn3193805
 ## References 
 
