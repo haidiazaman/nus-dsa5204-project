@@ -268,6 +268,112 @@ def evaluate_finetune_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split
 
     plt.show()
     
+
+def evaluate_rnn(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
+    
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    ############################
+    # DEFINE MODEL AND EVALUATE
+    ############################
+    
+    # load best pretraining model
+    best_model_path = 'rnn.pt'
+    rnn_model = RNN(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    rnn_model.load_state_dict(torch.load(best_model_path,map_location=device))
+    rnn_model.eval()
+
+    # latent_vector = pretraining_model.get_latent_vector(X_test.to(device))
+    predictions = rnn_model(X_test.to(device))
+    mse_loss = nn.MSELoss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mae_loss = nn.L1Loss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mse_loss = round(mse_loss.item(),6)
+    mae_loss = round(mae_loss.item(),6)
+    print(mse_loss,mae_loss)
+
+    # plot forecasting prediction
+    y = y_test.cpu().detach()
+    pred = predictions.cpu().detach()
+
+    plt.plot(y,label='original')
+    plt.plot(pred,label='rnn')
+    plt.legend()
+    plt.show()
+    
+
+def evaluate_lstm(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
+    
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    ############################
+    # DEFINE MODEL AND EVALUATE
+    ############################
+    # load best pretraining model
+    best_model_path = 'lstm.pt'
+    rnn_model = LSTM(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    rnn_model.load_state_dict(torch.load(best_model_path,map_location=device))
+    rnn_model.eval()
+
+    # latent_vector = pretraining_model.get_latent_vector(X_test.to(device))
+    predictions = rnn_model(X_test.to(device))
+    mse_loss = nn.MSELoss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mae_loss = nn.L1Loss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mse_loss = round(mse_loss.item(),6)
+    mae_loss = round(mae_loss.item(),6)
+    print(mse_loss,mae_loss)
+
+    # plot forecasting prediction
+    y = y_test.cpu().detach()
+    pred = predictions.cpu().detach()
+
+    plt.plot(y,label='original')
+    plt.plot(pred,label='lstm')
+    plt.legend()
+    plt.show()
+    
+
+def evaluate_gru(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
+    
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    ############################
+    # DEFINE MODEL AND EVALUATE
+    ############################
+    
+    # load best pretraining model
+    best_model_path = 'gru.pt'
+    rnn_model = GRU(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    rnn_model.load_state_dict(torch.load(best_model_path,map_location=device))
+    rnn_model.eval()
+
+    # latent_vector = pretraining_model.get_latent_vector(X_test.to(device))
+    predictions = rnn_model(X_test.to(device))
+    mse_loss = nn.MSELoss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mae_loss = nn.L1Loss()(predictions.cpu().detach(),y_test.cpu().detach())
+    mse_loss = round(mse_loss.item(),6)
+    mae_loss = round(mae_loss.item(),6)
+    print(mse_loss,mae_loss)
+
+    # plot forecasting prediction
+    y = y_test.cpu().detach()
+    pred = predictions.cpu().detach()
+
+    plt.plot(y,label='original')
+    plt.plot(pred,label='gru')
+    plt.legend()
+    plt.show()    
     
 
 
@@ -275,8 +381,8 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--phase', default='pretrain', choices=['pretrain','finetune'])
-    parser.add_argument('--mae', default='mae', choices=['mae','no mae'])
+    parser.add_argument('--phase', default='pretrain', choices=['pretrain','finetune','train'], help='train is only for rnn,lstm,gru, finetune and pretrain is for the transformer architectures')
+    parser.add_argument('--model_type', default='mae', choices=['mae','no mae','rnn','lstm','gru'])
     parser.add_argument('--csvPath', default='ETTh1.csv', help='the directory of training data')
     parser.add_argument('--batch_size', type=int, default=512, help='batch size for training')
     parser.add_argument('--train_val_test_split', default='[0.7,0.2,0.1]', help='specify train-val-test split here, pass a string of list of floats')
@@ -287,14 +393,23 @@ if __name__ == '__main__':
     
     opt = parser.parse_args()
 
-    if opt.phase == 'pretrain' and opt.mae == 'mae':
+    if opt.phase == 'pretrain' and opt.model_type == 'mae':
         evaluate_pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
 
-    elif opt.phase == 'finetune' and opt.mae == 'mae':
+    elif opt.phase == 'finetune' and opt.model_type == 'mae':
         evaluate_finetune_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
         
-    elif opt.phase == 'pretrain' and opt.mae == 'no mae':
+    elif opt.phase == 'pretrain' and opt.model_type == 'no mae':
         evaluate_pretrain_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
 
-    elif opt.phase == 'finetune' and opt.mae == 'no mae':
+    elif opt.phase == 'finetune' and opt.model_type == 'no mae':
         evaluate_finetune_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'rnn':
+        evaluate_rnn(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'lstm':
+        evaluate_lstm(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'gru':
+        evaluate_gru(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)

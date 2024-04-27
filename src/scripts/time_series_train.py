@@ -427,13 +427,248 @@ def finetune_no_mae(csvPath,batch_size,train_val_test_split,lookback,date_col_na
     plt.show()
     
     
+def train_rnn(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name,epochs):
+
+    train_loader,val_loader = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    #########################
+    # DEFINE MODEL AND TRAIN
+    #########################
+    # Train the model
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    criterion = nn.MSELoss()
+    model = RNN(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=3)
+
+    early_stop_count = 0
+    min_val_loss = float('inf')
+
+    train_losses=[]
+    val_losses=[]
+
+
+    for epoch in range(epochs):
+        epoch_start_time = time.time()
+        print(f'epoch {epoch}')
+        model.train()
+
+        train_running_loss = []
+        for batch in train_loader:
+            x_batch, y_batch = batch
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(x_batch)
+            loss = criterion(outputs, y_batch)
+            train_running_loss.append(loss.item())
+            loss.backward()
+            optimizer.step()
+
+        train_loss = np.mean(train_running_loss)
+        train_losses.append(train_loss)
+
+        # Validation
+        model.eval()
+        val_running_loss = []
+        with torch.no_grad():
+            for batch in val_loader:
+                x_batch, y_batch = batch
+                x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+                outputs = model(x_batch)
+                loss = criterion(outputs, y_batch)
+                val_running_loss.append(loss.item())
+
+        val_loss = np.mean(val_running_loss)
+        val_losses.append(val_loss)
+
+        scheduler.step(val_loss)
+
+        if val_loss < min_val_loss:
+            min_val_loss = val_loss
+            torch.save(model.state_dict(), 'rnn.pt')
+            print(f'model epoch {epoch} saved as rnn.pt')
+            early_stop_count = 0
+        else:
+            early_stop_count += 1
+
+        if early_stop_count >= 10:
+            print("Early stopping!")
+            break
+
+        time_taken = round(time.time()-epoch_start_time,1)
+        print(f"Epoch {epoch + 1}/{epochs}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, time_taken: {time_taken}")
+
+        
+def train_lstm(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name,epochs):
+
+    train_loader,val_loader = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    #########################
+    # DEFINE MODEL AND TRAIN
+    #########################
+    
+    # Train the model
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    criterion = nn.MSELoss()
+    model = LSTM(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=3)
+
+    early_stop_count = 0
+    min_val_loss = float('inf')
+
+    train_losses=[]
+    val_losses=[]
+
+
+    for epoch in range(epochs):
+        epoch_start_time = time.time()
+        print(f'epoch {epoch}')
+        model.train()
+
+        train_running_loss = []
+        for batch in train_loader:
+            x_batch, y_batch = batch
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(x_batch)
+            loss = criterion(outputs, y_batch)
+            train_running_loss.append(loss.item())
+            loss.backward()
+            optimizer.step()
+
+        train_loss = np.mean(train_running_loss)
+        train_losses.append(train_loss)
+
+        # Validation
+        model.eval()
+        val_running_loss = []
+        with torch.no_grad():
+            for batch in val_loader:
+                x_batch, y_batch = batch
+                x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+                outputs = model(x_batch)
+                loss = criterion(outputs, y_batch)
+                val_running_loss.append(loss.item())
+
+        val_loss = np.mean(val_running_loss)
+        val_losses.append(val_loss)
+
+        scheduler.step(val_loss)
+
+        if val_loss < min_val_loss:
+            min_val_loss = val_loss
+            torch.save(model.state_dict(), 'lstm.pt')
+            print(f'model epoch {epoch} saved as lstm.pt')
+            early_stop_count = 0
+        else:
+            early_stop_count += 1
+
+        if early_stop_count >= 10:
+            print("Early stopping!")
+            break
+
+        time_taken = round(time.time()-epoch_start_time,1)
+        print(f"Epoch {epoch + 1}/{epochs}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, time_taken: {time_taken}")
+    
+def train_gru(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name,epochs):
+
+    train_loader,val_loader = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
+    #########################
+    # DEFINE MODEL AND TRAIN
+    #########################
+    
+    # Train the model
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    criterion = nn.MSELoss()
+    model = GRU(
+        input_size=1,
+        hidden_size=4,
+        num_stacked_layers=1
+    ).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=3)
+
+    early_stop_count = 0
+    min_val_loss = float('inf')
+
+    train_losses=[]
+    val_losses=[]
+
+
+    for epoch in range(epochs):
+        epoch_start_time = time.time()
+        print(f'epoch {epoch}')
+        model.train()
+
+        train_running_loss = []
+        for batch in train_loader:
+            x_batch, y_batch = batch
+            x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(x_batch)
+            loss = criterion(outputs, y_batch)
+            train_running_loss.append(loss.item())
+            loss.backward()
+            optimizer.step()
+
+        train_loss = np.mean(train_running_loss)
+        train_losses.append(train_loss)
+
+        # Validation
+        model.eval()
+        val_running_loss = []
+        with torch.no_grad():
+            for batch in val_loader:
+                x_batch, y_batch = batch
+                x_batch, y_batch = x_batch.to(device), y_batch.to(device)
+                outputs = model(x_batch)
+                loss = criterion(outputs, y_batch)
+                val_running_loss.append(loss.item())
+
+        val_loss = np.mean(val_running_loss)
+        val_losses.append(val_loss)
+
+        scheduler.step(val_loss)
+
+        if val_loss < min_val_loss:
+            min_val_loss = val_loss
+            torch.save(model.state_dict(), 'gru.pt')
+            print(f'model epoch {epoch} saved as gru.pt')
+            early_stop_count = 0
+        else:
+            early_stop_count += 1
+
+        if early_stop_count >= 10:
+            print("Early stopping!")
+            break
+
+        time_taken = round(time.time()-epoch_start_time,1)
+        print(f"Epoch {epoch + 1}/{epochs}, train loss: {train_loss:.4f}, val loss: {val_loss:.4f}, time_taken: {time_taken}")
+    
+    
 
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--phase', default='pretrain', choices=['pretrain','finetune'])
-    parser.add_argument('--mae', default='mae', choices=['mae','no mae'])
+    parser.add_argument('--phase', default='pretrain', choices=['pretrain','finetune','train'], help='train is only for rnn,lstm,gru, finetune and pretrain is for the transformer architectures')
+    parser.add_argument('--model_type', default='mae', choices=['mae','no mae','rnn','lstm','gru'])
     parser.add_argument('--csvPath', default='ETTh1.csv', help='the directory of training data')
     parser.add_argument('--batch_size', type=int, default=512, help='batch size for training')
     parser.add_argument('--train_val_test_split', default='[0.7,0.2,0.1]', help='specify train-val-test split here, pass a string of list of floats')
@@ -445,15 +680,23 @@ if __name__ == '__main__':
     
     opt = parser.parse_args()
 
-    if opt.phase == 'pretrain' and opt.mae == 'mae':
+    if opt.phase == 'pretrain' and opt.model_type == 'mae':
         pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.masking_ratio,opt.epochs)
 
-
-    elif opt.phase == 'finetune' and opt.mae == 'mae':
+    elif opt.phase == 'finetune' and opt.model_type == 'mae':
         finetune_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.masking_ratio,opt.epochs)
         
-    elif opt.phase == 'pretrain' and opt.mae == 'no mae':
+    elif opt.phase == 'pretrain' and opt.model_type == 'no mae':
         pretrain_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
 
-    elif opt.phase == 'finetune' and opt.mae == 'no mae':
+    elif opt.phase == 'finetune' and opt.model_type == 'no mae':
         finetune_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'rnn':
+        train_rnn(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'lstm':
+        train_lstm(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
+        
+    elif opt.phase == 'train' and opt.model_type == 'gru':
+        train_gru(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs)
