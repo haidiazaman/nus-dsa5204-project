@@ -16,12 +16,11 @@ To set up using pip, run the following:
 ### Project Structure (To be updated)
 
     .
-    ├── data                    # Put data in this folder. **Do not commit!**
-    │   ├── imagenet            # ImageNet dataset
     ├── src                     # Source code
     │   ├── dataset             # Dataloaders
     │   ├── model               # Model architectures
-    │   └── scripts             # Training scripts  
+    │   └── scripts             # Training, Evaluation scripts  
+    ├── inference_notebook_examples # Quick look on our model inference results after training
     ├── .gitignore
     ├── README.md
     └── requirements.txt
