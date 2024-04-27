@@ -2,7 +2,7 @@
 
 This repository hosts the code for our NUS DSA5204 Project, which aims to reproduce and extend the work done in [Masked Autoencoders Are Scalable Vision Learners](https://arxiv.org/abs/2111.06377).
 This diagram shows the model architecture for the paper. The encoder is a ViT and decoder is a set of transformer blocks.
-![alt text] (https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/mae_architecture.png)
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/mae_architecture.png)
 
 ## Development Setup
 
