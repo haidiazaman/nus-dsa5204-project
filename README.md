@@ -4,6 +4,22 @@ This repository hosts the code for our NUS DSA5204 Project, which aims to reprod
 This diagram shows the model architecture for the paper. The encoder is a ViT and decoder is a set of transformer blocks.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/mae_architecture.png)
 
+## Results
+Reproduction of paper results using TinyImageNet dataset.
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/tinyimgnet.png)
+
+Extension 1: Time Series forecast (compare no MAE vs MAE across 3 different masking ratios, these time series are the smoothed time series of the actual forecast)
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/time_series_results.png)
+
+Extension 2: 2D Segmentation
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/semseg_output.png)
+
+Extension 3: 3D Segmentation
+![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/3d_seg_output.png)
+
+Extension 4: Data Imputation
+![alt text]()
+
 ## Development Setup
 
 ### Setting up environment
