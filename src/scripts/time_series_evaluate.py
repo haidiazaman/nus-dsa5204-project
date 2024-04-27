@@ -14,9 +14,10 @@ from time_serie_model import *
 from time_serie_dataset import *
 import matplotlib.pyplot as plt
 
+def preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name):
 
-def evaluate_pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
-    
+    train_size,val_size,test_size = eval(train_val_test_split)
+
     #########################
     # DATASET PREPROCESSING
     #########################
@@ -47,49 +48,37 @@ def evaluate_pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,op
     X = dc(np.flip(X, axis=1))
 
     # train test split
-    X_train = X[:int(len(X) * train_size)]
-    X_val = X[int(len(X) * train_size):int(len(X) * train_size)+int(len(X) * val_size)]
     X_test = X[int(len(X) * train_size)+int(len(X) * val_size):]
-
-    y_train = y[:int(len(y) * train_size)]
-    y_val = y[int(len(y) * train_size):int(len(y) * train_size)+int(len(y) * val_size)]
     y_test = y[int(len(y) * train_size)+int(len(y) * val_size):]
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
+    print(X_test.shape)
+    print(y_test.shape)
 
-    X_train = X_train.reshape((-1, lookback, 1))
-    X_val = X_val.reshape((-1, lookback, 1))
     X_test = X_test.reshape((-1, lookback, 1))
-    y_train = y_train.reshape((-1, 1))
-    y_val = y_val.reshape((-1, 1))
     y_test = y_test.reshape((-1, 1))
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
+    print(X_test.shape)
+    print(y_test.shape)
 
-    X_train = torch.tensor(X_train).float()
-    X_val = torch.tensor(X_val).float()
     X_test = torch.tensor(X_test).float()
-    y_train = torch.tensor(y_train).float()
-    y_val = torch.tensor(y_val).float()
     y_test = torch.tensor(y_test).float()
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
+    print(X_test.shape)
+    print(y_test.shape)
 
-
-    train_dataset = TimeSeriesDataset(X_train, y_train)
-    val_dataset = TimeSeriesDataset(X_val, y_val)
     test_dataset = TimeSeriesDataset(X_test, y_test)
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, drop_last=True) # set all shuffle=False since its sequential data
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
 
     # print to check
-    for _, batch in enumerate(train_loader):
+    for _, batch in enumerate(test_loader):
         x_batch, y_batch = batch[0].to(device), batch[1].to(device)
         print(x_batch.shape, y_batch.shape)
         break
+
+    return X_test,y_test
+
+
+def evaluate_pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
     
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
+
     ############################
     # DEFINE MODEL AND EVALUATE
     ############################
@@ -147,80 +136,8 @@ def evaluate_pretrain_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,op
         
 def evaluate_finetune_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
     
-    #########################
-    # DATASET PREPROCESSING
-    #########################
-    data = pd.read_csv(csvPath)
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(device)
-
-    data = data[[date_col_name,value_col_name]]
-    data[date_col_name] = pd.to_datetime(data[date_col_name])
-    plt.plot(data[date_col_name], data[value_col_name])
-    plt.show()
-
-
-    shifted_df = prepare_dataframe_for_lstm(data, lookback, date_col_name, value_col_name)
-    shifted_df
-
-    # format X and y from df and scale it
-    shifted_df_as_np = shifted_df.to_numpy()
-    print(shifted_df_as_np.shape)
-
-    # normalise the data
-    scaler = MinMaxScaler(feature_range=(-1, 1))
-    shifted_df_as_np = scaler.fit_transform(shifted_df_as_np)
-    X = shifted_df_as_np[:, 1:]
-    y = shifted_df_as_np[:, 0]
-    print(X.shape, y.shape)
-    X = dc(np.flip(X, axis=1))
-
-    # train test split
-    X_train = X[:int(len(X) * train_size)]
-    X_val = X[int(len(X) * train_size):int(len(X) * train_size)+int(len(X) * val_size)]
-    X_test = X[int(len(X) * train_size)+int(len(X) * val_size):]
-
-    y_train = y[:int(len(y) * train_size)]
-    y_val = y[int(len(y) * train_size):int(len(y) * train_size)+int(len(y) * val_size)]
-    y_test = y[int(len(y) * train_size)+int(len(y) * val_size):]
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = X_train.reshape((-1, lookback, 1))
-    X_val = X_val.reshape((-1, lookback, 1))
-    X_test = X_test.reshape((-1, lookback, 1))
-    y_train = y_train.reshape((-1, 1))
-    y_val = y_val.reshape((-1, 1))
-    y_test = y_test.reshape((-1, 1))
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = torch.tensor(X_train).float()
-    X_val = torch.tensor(X_val).float()
-    X_test = torch.tensor(X_test).float()
-    y_train = torch.tensor(y_train).float()
-    y_val = torch.tensor(y_val).float()
-    y_test = torch.tensor(y_test).float()
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-
-    train_dataset = TimeSeriesDataset(X_train, y_train)
-    val_dataset = TimeSeriesDataset(X_val, y_val)
-    test_dataset = TimeSeriesDataset(X_test, y_test)
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, drop_last=True) # set all shuffle=False since its sequential data
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-
-    # print to check
-    for _, batch in enumerate(train_loader):
-        x_batch, y_batch = batch[0].to(device), batch[1].to(device)
-        print(x_batch.shape, y_batch.shape)
-        break
-    
-    
     ############################
     # DEFINE MODEL AND EVALUATE
     ############################
@@ -263,80 +180,8 @@ def evaluate_finetune_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,op
 
 def evaluate_pretrain_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
     
-    #########################
-    # DATASET PREPROCESSING
-    #########################
-    data = pd.read_csv(csvPath)
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(device)
-
-    data = data[[date_col_name,value_col_name]]
-    data[date_col_name] = pd.to_datetime(data[date_col_name])
-    plt.plot(data[date_col_name], data[value_col_name])
-    plt.show()
-
-
-    shifted_df = prepare_dataframe_for_lstm(data, lookback, date_col_name, value_col_name)
-    shifted_df
-
-    # format X and y from df and scale it
-    shifted_df_as_np = shifted_df.to_numpy()
-    print(shifted_df_as_np.shape)
-
-    # normalise the data
-    scaler = MinMaxScaler(feature_range=(-1, 1))
-    shifted_df_as_np = scaler.fit_transform(shifted_df_as_np)
-    X = shifted_df_as_np[:, 1:]
-    y = shifted_df_as_np[:, 0]
-    print(X.shape, y.shape)
-    X = dc(np.flip(X, axis=1))
-
-    # train test split
-    X_train = X[:int(len(X) * train_size)]
-    X_val = X[int(len(X) * train_size):int(len(X) * train_size)+int(len(X) * val_size)]
-    X_test = X[int(len(X) * train_size)+int(len(X) * val_size):]
-
-    y_train = y[:int(len(y) * train_size)]
-    y_val = y[int(len(y) * train_size):int(len(y) * train_size)+int(len(y) * val_size)]
-    y_test = y[int(len(y) * train_size)+int(len(y) * val_size):]
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = X_train.reshape((-1, lookback, 1))
-    X_val = X_val.reshape((-1, lookback, 1))
-    X_test = X_test.reshape((-1, lookback, 1))
-    y_train = y_train.reshape((-1, 1))
-    y_val = y_val.reshape((-1, 1))
-    y_test = y_test.reshape((-1, 1))
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = torch.tensor(X_train).float()
-    X_val = torch.tensor(X_val).float()
-    X_test = torch.tensor(X_test).float()
-    y_train = torch.tensor(y_train).float()
-    y_val = torch.tensor(y_val).float()
-    y_test = torch.tensor(y_test).float()
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-
-    train_dataset = TimeSeriesDataset(X_train, y_train)
-    val_dataset = TimeSeriesDataset(X_val, y_val)
-    test_dataset = TimeSeriesDataset(X_test, y_test)
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, drop_last=True) # set all shuffle=False since its sequential data
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-
-    # print to check
-    for _, batch in enumerate(train_loader):
-        x_batch, y_batch = batch[0].to(device), batch[1].to(device)
-        print(x_batch.shape, y_batch.shape)
-        break
-        
-    
     ############################
     # DEFINE MODEL AND EVALUATE
     ############################
@@ -384,80 +229,8 @@ def evaluate_pretrain_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split
 
 def evaluate_finetune_no_mae(opt.csvPath,opt.batch_size,opt.train_val_test_split,opt.lookback,opt.date_col_name,opt.value_col_name,opt.epochs):
     
-    #########################
-    # DATASET PREPROCESSING
-    #########################
-    data = pd.read_csv(csvPath)
+    X_test,y_test = preprocess_data(csvPath,batch_size,train_val_test_split,lookback,date_col_name,value_col_name)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(device)
-
-    data = data[[date_col_name,value_col_name]]
-    data[date_col_name] = pd.to_datetime(data[date_col_name])
-    plt.plot(data[date_col_name], data[value_col_name])
-    plt.show()
-
-
-    shifted_df = prepare_dataframe_for_lstm(data, lookback, date_col_name, value_col_name)
-    shifted_df
-
-    # format X and y from df and scale it
-    shifted_df_as_np = shifted_df.to_numpy()
-    print(shifted_df_as_np.shape)
-
-    # normalise the data
-    scaler = MinMaxScaler(feature_range=(-1, 1))
-    shifted_df_as_np = scaler.fit_transform(shifted_df_as_np)
-    X = shifted_df_as_np[:, 1:]
-    y = shifted_df_as_np[:, 0]
-    print(X.shape, y.shape)
-    X = dc(np.flip(X, axis=1))
-
-    # train test split
-    X_train = X[:int(len(X) * train_size)]
-    X_val = X[int(len(X) * train_size):int(len(X) * train_size)+int(len(X) * val_size)]
-    X_test = X[int(len(X) * train_size)+int(len(X) * val_size):]
-
-    y_train = y[:int(len(y) * train_size)]
-    y_val = y[int(len(y) * train_size):int(len(y) * train_size)+int(len(y) * val_size)]
-    y_test = y[int(len(y) * train_size)+int(len(y) * val_size):]
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = X_train.reshape((-1, lookback, 1))
-    X_val = X_val.reshape((-1, lookback, 1))
-    X_test = X_test.reshape((-1, lookback, 1))
-    y_train = y_train.reshape((-1, 1))
-    y_val = y_val.reshape((-1, 1))
-    y_test = y_test.reshape((-1, 1))
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-    X_train = torch.tensor(X_train).float()
-    X_val = torch.tensor(X_val).float()
-    X_test = torch.tensor(X_test).float()
-    y_train = torch.tensor(y_train).float()
-    y_val = torch.tensor(y_val).float()
-    y_test = torch.tensor(y_test).float()
-    print(X_train.shape, X_val.shape, X_test.shape)
-    print(y_train.shape, y_val.shape, y_test.shape)
-
-
-    train_dataset = TimeSeriesDataset(X_train, y_train)
-    val_dataset = TimeSeriesDataset(X_val, y_val)
-    test_dataset = TimeSeriesDataset(X_test, y_test)
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, drop_last=True) # set all shuffle=False since its sequential data
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, drop_last=True)
-
-    # print to check
-    for _, batch in enumerate(train_loader):
-        x_batch, y_batch = batch[0].to(device), batch[1].to(device)
-        print(x_batch.shape, y_batch.shape)
-        break
-    
-    
     ############################
     # DEFINE MODEL AND EVALUATE
     ############################
