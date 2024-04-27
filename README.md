@@ -2,13 +2,6 @@
 
 This repository hosts the code for our NUS DSA5204 Project, which aims to reproduce and extend the work done in [Masked Autoencoders Are Scalable Vision Learners](https://arxiv.org/abs/2111.06377).
 
-## Note to group members (This section will be removed upon submission)
-
-- Do not commit any data! Just update markdown on how to download data and structure the files/folders
-- Do not commit any Jupyter notebooks, write a script
-- Use PyTorch
-- Refer to [here](https://github.com/joelparkerhenderson/git-commit-message) to write good commit messages
-
 ## Development Setup
 
 ### Setting up environment
@@ -43,7 +36,9 @@ We make use of the following datasets:
         val = ImageNet(root='./data/imagenet1k', split='val')
 
 - ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
+- Time Series: Data is available at: https://github.com/zhouhaoyi/ETDataset
 
 ## References 
 
 Upernet: https://github.com/CSAILVision/semantic-segmentation-pytorch
+Time Series: https://github.com/asmodaay/ti-mae
