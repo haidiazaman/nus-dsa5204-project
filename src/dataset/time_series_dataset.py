@@ -1,5 +1,6 @@
 import pandas as pd
 from torch.utils.data import Dataset
+from copy import deepcopy as dc
 
 # functions
 def prepare_dataframe_for_lstm(df, n_steps, date_col_name, value_col_name):
