@@ -35,6 +35,7 @@ We make use of the following datasets:
 - Time Series, ETTh1: Data is available at: https://github.com/zhouhaoyi/ETDataset
 - 2d Segmentation, ADE20k: Data is available at: http://data.csail.mit.edu/places/ADEchallenge/ADEChallengeData2016.zip. Unzip and place directly in data folder as is
 - 3d Segmentation, BTCV: https://www.synapse.org/#!Synapse:syn3193805
+- Imputation of missing data, California Housing Price, Data is available at https://www.kaggle.com/datasets/camnugent/california-housing-prices
 
 ## Results
 Reproduction of paper results using TinyImageNet dataset. Example results of image reconstruction of TinyImageNet data using MAE architecture. For each triplet, the leftmost image displays the base image, the middle image displays the input data and the rightmost image displays the reconstructed image.
