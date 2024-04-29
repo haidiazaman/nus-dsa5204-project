@@ -53,6 +53,9 @@ Extension 3: 3D Segmentation. Example 3D Segmentation result. MAE pretraining sh
 Extension 4: Data Imputation. Training loss over epochs comparison. MAE shows unstable training and eventually poorer results compared to no MAE.
 ![alt text](https://github.com/liawzhengkai/dsa5204-project/blob/main/imgs/imputation_res.png)
 
+## Model weights
+Trained model weights can be accessed via this Google drive link: https://drive.google.com/drive/u/0/folders/1oI8RIMEDl6vOW0-mutafXjPSTByXshNO
+
 ## References 
 
 - Upernet: https://github.com/CSAILVision/semantic-segmentation-pytorch
